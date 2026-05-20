@@ -151,14 +151,15 @@
   }
 
   .comeback-timer {
-    font-size: clamp(48px, 12vw, 120px);
+    font-size: clamp(32px, 10vw, 120px);
     color: var(--fg);
     letter-spacing: -0.01em;
-    line-height: 1;
+    line-height: 1.1;
     font-variant-numeric: tabular-nums;
     transition: color 2s;
-    white-space: nowrap;
+    word-break: break-word;
     text-align: center;
+    word-spacing: 0.1em;
   }
 
   .comeback-timer.near {
@@ -200,6 +201,14 @@
     z-index: 100;
   }
 
+  @media (max-width: 600px) {
+    .font-control {
+      top: auto;
+      bottom: 2rem;
+      right: 1rem;
+    }
+  }
+
   .font-btn {
     padding: 0.5rem 1rem;
     background: var(--dim);
@@ -236,8 +245,10 @@
   <ol>
     <li>If you DM me, I might not see it before the last timer is done.</li>
     <li>I don't owe anyone a response, a timeline, or an explanation.</li>
-    <li>Nothing is personal, but I won't answer questions in dm concerning this.</li>
-    <li>I might never come back if it's really bad, but there's 99% chance I come back. (check last timer)</li>
+    <li>Nothing is personal, but i won't answer questions.</li>
+    <li>I might never come back if it's really back, but there's 99% chance I come back. (check last timer)</li>
+    <li>If you think about dming me to know something on this, don't be scared to get no answers.</li>
+    <li>Lastly, everyone that cares about me, thank you. But I won't tell you anything even if you love me, or that I love you.</li>
     <li>I love you all, kiss kiss!! ding, dong, ding, dong...</li>
   </ol>
 </div>
@@ -263,6 +274,12 @@
   <span class="comeback-sub">June 27, 2026</span>
 </div>
 
+<div class="comeback-wrap">
+  <span class="comeback-label">Freedom.</span>
+  <span class="comeback-timer" id="freedom">--d --h --m --s ---ms</span>
+  <span class="comeback-sub">July 11, 2027</span>
+</div>
+
 <script>
   const targets = [
     { id: 'cd1', date: new Date('2026-06-11T00:00:00') },
@@ -270,6 +287,7 @@
     { id: 'cd3', date: new Date('2026-06-26T00:00:00') },
   ];
   const comeback = { id: 'comeback', date: new Date('2026-06-27T00:00:00') };
+  const freedom = { id: 'freedom', date: new Date('2027-07-11T00:00:00') };
 
   function fmt(diff) {
     if (diff <= 0) return '00d 00h 00m 00s 000ms';
@@ -295,6 +313,13 @@
       cb.textContent = fmt(diff);
       if (diff < 7 * 24 * 3600 * 1000) cb.classList.add('near');
       else cb.classList.remove('near');
+    }
+    const fd = document.getElementById(freedom.id);
+    if (fd) {
+      const diff = freedom.date - now;
+      fd.textContent = fmt(diff);
+      if (diff < 7 * 24 * 3600 * 1000) fd.classList.add('near');
+      else fd.classList.remove('near');
     }
   }
 
