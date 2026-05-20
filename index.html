@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>.</title>
+<style>
+  @font-face {
+    font-family: 'FFF Tusj';
+    src: url('fonts/FFFTusj.woff') format('woff'),
+         url('fonts/FFFTusj.ttf') format('truetype'),
+         url('https://fonts.cdnfonts.com/s/14716/FFFTusj.woff') format('woff');
+    font-weight: normal;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0a;
+    --fg: #e8e4dc;
+    --dim: #3a3830;
+    --muted: #6b6660;
+    --accent: #c8b89a;
+    --red: #8b2e2e;
+  }
+
+  html, body {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'FFF Tusj', 'Courier New', monospace;
+    overflow-x: hidden;
+  }
+
+  html.fallback-font, body.fallback-font {
+    font-family: 'Courier New', monospace !important;
+  }
+
+  html.custom-font, body.custom-font {
+    font-family: 'FFF Tusj', 'Courier New', monospace !important;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 1.5rem;
+    gap: 0;
+    min-height: 100vh;
+  }
+
+  .rules {
+    width: 100%;
+    max-width: 1000px;
+    border: 2px solid var(--dim);
+    padding: 2rem 2.5rem;
+    margin-bottom: 4rem;
+    position: relative;
+    flex-shrink: 0;
+    margin-top: auto;
+  }
+
+  .rules::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: 2rem;
+    width: 4rem;
+    height: 1px;
+    background: var(--bg);
+  }
+
+  .rules ol {
+    list-style: none;
+    counter-reset: rules;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
+  .rules ol li {
+    counter-increment: rules;
+    display: grid;
+    grid-template-columns: 1.6rem 1fr;
+    gap: 0.5rem;
+    font-size: clamp(12px, 1.4vw, 14px);
+    color: var(--accent);
+    letter-spacing: 0.03em;
+    line-height: 1.5;
+  }
+
+  .rules ol li::before {
+    content: counter(rules) ".";
+    color: var(--muted);
+    padding-top: 1px;
+  }
+
+  .timers {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    flex-shrink: 0;
+  }
+
+  .timer-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    padding: 1.4rem 0;
+    border-bottom: 1px solid var(--dim);
+    gap: 1rem;
+  }
+
+  .timer-row:first-child {
+    border-top: 1px solid var(--dim);
+  }
+
+  .timer-date {
+    font-size: clamp(11px, 1.2vw, 12px);
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .timer-count {
+    font-size: clamp(14px, 2.4vw, 24px);
+    color: var(--fg);
+    letter-spacing: 0.04em;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .comeback-wrap {
+    width: 100%;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    padding-bottom: 3rem;
+  }
+
+  .comeback-label {
+    font-size: clamp(11px, 1.2vw, 13px);
+    color: var(--muted);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .comeback-timer {
+    font-size: clamp(48px, 12vw, 120px);
+    color: var(--fg);
+    letter-spacing: -0.01em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    transition: color 2s;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .comeback-timer.near {
+    color: var(--red);
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  .comeback-sub {
+    font-size: 13px;
+    color: var(--dim);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-top: 0.3rem;
+  }
+
+  .rules {
+    flex-shrink: 0;
+  }
+
+  .timers {
+    flex-shrink: 0;
+  }
+
+  .comeback-wrap {
+    flex-shrink: 0;
+  }
+
+  .font-control {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 100;
+  }
+
+  .font-btn {
+    padding: 0.5rem 1rem;
+    background: var(--dim);
+    border: 1px solid var(--muted);
+    color: var(--fg);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+
+  .font-btn:hover {
+    background: var(--muted);
+    color: var(--bg);
+  }
+
+  .font-btn.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+</style>
+</head>
+<body>
+
+<div class="font-control">
+  <button class="font-btn active" data-font="FFF Tusj">Custom</button>
+  <button class="font-btn" data-font="fallback">Fallback</button>
+</div>
+
+<div class="rules">
+  <ol>
+    <li>If you DM me, I might not see it before the last timer is done.</li>
+    <li>I don't owe anyone a response, a timeline, or an explanation.</li>
+    <li>Nothing is personal, but i won't answer questions.</li>
+    <li>I might never come back if it's really back, but there's 98% chance i come back.</li>
+    <li>I love you all, kiss kiss!! ding, dong, ding, dong...</li>
+  </ol>
+</div>
+
+<div class="timers">
+  <div class="timer-row">
+    <span class="timer-date">June 11, 2026</span>
+    <span class="timer-count" id="cd1">--d --h --m --s ---ms</span>
+  </div>
+  <div class="timer-row">
+    <span class="timer-date">June 12, 2026</span>
+    <span class="timer-count" id="cd2">--d --h --m --s ---ms</span>
+  </div>
+  <div class="timer-row">
+    <span class="timer-date">June 26, 2026</span>
+    <span class="timer-count" id="cd3">--d --h --m --s ---ms</span>
+  </div>
+</div>
+
+<div class="comeback-wrap">
+  <span class="comeback-label">My comeback.</span>
+  <span class="comeback-timer" id="comeback">--d --h --m --s ---ms</span>
+  <span class="comeback-sub">June 27, 2026</span>
+</div>
+
+<script>
+  const targets = [
+    { id: 'cd1', date: new Date('2026-06-11T00:00:00') },
+    { id: 'cd2', date: new Date('2026-06-12T00:00:00') },
+    { id: 'cd3', date: new Date('2026-06-26T00:00:00') },
+  ];
+  const comeback = { id: 'comeback', date: new Date('2026-06-27T00:00:00') };
+
+  function fmt(diff) {
+    if (diff <= 0) return '00d 00h 00m 00s 000ms';
+    const totalMs = Math.floor(diff);
+    const ms = totalMs % 1000;
+    const totalSec = Math.floor(totalMs / 1000);
+    const s = totalSec % 60;
+    const m = Math.floor(totalSec / 60) % 60;
+    const h = Math.floor(totalSec / 3600) % 24;
+    const d = Math.floor(totalSec / 86400);
+    return `${String(d).padStart(2,'0')}d ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s ${String(ms).padStart(3,'0')}ms`;
+  }
+
+  function tick() {
+    const now = Date.now();
+    targets.forEach(t => {
+      const el = document.getElementById(t.id);
+      if (el) el.textContent = fmt(t.date - now);
+    });
+    const cb = document.getElementById(comeback.id);
+    if (cb) {
+      const diff = comeback.date - now;
+      cb.textContent = fmt(diff);
+      if (diff < 7 * 24 * 3600 * 1000) cb.classList.add('near');
+      else cb.classList.remove('near');
+    }
+  }
+
+  tick();
+  setInterval(tick, 50);
+
+  // Font changer
+  const fontBtns = document.querySelectorAll('.font-btn');
+  
+  // Initialize with custom font
+  document.documentElement.classList.add('custom-font');
+  document.body.classList.add('custom-font');
+  
+  fontBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const font = btn.dataset.font;
+      fontBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      if (font === 'fallback') {
+        document.documentElement.classList.remove('custom-font');
+        document.documentElement.classList.add('fallback-font');
+        document.body.classList.remove('custom-font');
+        document.body.classList.add('fallback-font');
+      } else {
+        document.documentElement.classList.remove('fallback-font');
+        document.documentElement.classList.add('custom-font');
+        document.body.classList.remove('fallback-font');
+        document.body.classList.add('custom-font');
+      }
+    });
+  });
+</script>
+</body>
+</html>
