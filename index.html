@@ -4,16 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>.</title>
-<style>
-  @font-face {
-    font-family: 'FFF Tusj';
-    src: url('fonts/FFFTusj.woff') format('woff'),
-         url('fonts/FFFTusj.ttf') format('truetype'),
-         url('https://fonts.cdnfonts.com/s/14716/FFFTusj.woff') format('woff');
-    font-weight: normal;
-  }
 
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+<style>
+
+  /* =========================================================
+     SETTINGS
+     ========================================================= */
 
   :root {
     --bg: #0a0a0a;
@@ -22,176 +18,1132 @@
     --muted: #6b6660;
     --accent: #c8b89a;
     --red: #8b2e2e;
+
+    /* Final message size */
+    --text-size: clamp(24px, 5vw, 60px);
+
+    /* How long each line takes to appear */
+    --line-fade-duration: 2s;
+
+    /* Tremble speeds */
+    --shake-ended-speed: 0.51s;
+    --shake-here-speed: 0.67s;
+    --shake-yet-speed: 0.37s;
+    --shake-kill-speed: 0.43s;
   }
 
-  html, body {
+
+  /* =========================================================
+     FONT
+     ========================================================= */
+
+  @font-face {
+    font-family: 'FFF Tusj';
+
+    src:
+      url('fonts/FFFTusj.woff') format('woff'),
+      url('fonts/FFFTusj.ttf') format('truetype'),
+      url('https://fonts.cdnfonts.com/s/14716/FFFTusj.woff') format('woff');
+
+    font-weight: normal;
+  }
+
+
+  /* =========================================================
+     BASE
+     ========================================================= */
+
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
     min-height: 100vh;
+
     background: var(--bg);
     color: var(--fg);
+
     font-family: 'FFF Tusj', 'Courier New', monospace;
+
     overflow-x: hidden;
   }
 
-  html.fallback-font, body.fallback-font {
+  html.fallback-font,
+  body.fallback-font {
     font-family: 'Courier New', monospace !important;
   }
 
-  html.custom-font, body.custom-font {
+  html.custom-font,
+  body.custom-font {
     font-family: 'FFF Tusj', 'Courier New', monospace !important;
   }
 
+
+  /* =========================================================
+     BODY
+     ========================================================= */
+
   body {
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
+
     justify-content: center;
+
     padding: 3rem 1.5rem;
+
     min-height: 100vh;
   }
 
+
+  /* =========================================================
+     TIMER
+     ========================================================= */
+
   .comeback-wrap {
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
+
     gap: 0.5rem;
   }
+
 
   .comeback-timer {
     font-size: clamp(32px, 10vw, 120px);
+
     color: var(--fg);
+
     letter-spacing: -0.01em;
+
     line-height: 1.1;
+
     font-variant-numeric: tabular-nums;
+
     transition: color 2s;
+
     word-break: break-word;
+
     text-align: center;
+
     word-spacing: 0.1em;
   }
 
+
   .comeback-timer.near {
     color: var(--red);
+
     animation: pulse 1.2s ease-in-out infinite;
   }
 
+
   @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
+
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.6;
+    }
+
   }
+
 
   .comeback-sub {
     font-size: 13px;
+
     color: var(--dim);
+
     letter-spacing: 0.3em;
+
     text-transform: uppercase;
+
     margin-top: 0.3rem;
   }
 
+
+  /* =========================================================
+     FONT CONTROL
+     ========================================================= */
+
   .font-control {
     position: fixed;
+
     top: 2rem;
+
     right: 2rem;
+
     display: flex;
+
     gap: 0.5rem;
+
     z-index: 100;
   }
 
-  @media (max-width: 600px) {
-    .font-control {
-      top: auto;
-      bottom: 2rem;
-      right: 1rem;
-    }
-  }
 
   .font-btn {
     padding: 0.5rem 1rem;
+
     background: var(--dim);
+
     border: 1px solid var(--muted);
+
     color: var(--fg);
+
     cursor: pointer;
+
     font-family: inherit;
+
     font-size: 12px;
+
     letter-spacing: 0.1em;
+
     text-transform: uppercase;
+
     transition: all 0.2s;
   }
 
+
   .font-btn:hover {
     background: var(--muted);
+
     color: var(--bg);
   }
+
 
   .font-btn.active {
     background: var(--accent);
+
     color: var(--bg);
+
     border-color: var(--accent);
   }
+
+
+  /* =========================================================
+     FINAL MESSAGE
+     ========================================================= */
+
+  .finished-message {
+    width: min(900px, 100%);
+
+    text-align: center;
+
+    font-size: var(--text-size);
+
+    line-height: 1.3;
+  }
+
+
+  /* =========================================================
+     MESSAGE LINES
+     ========================================================= */
+
+  .line {
+    display: block;
+
+    opacity: 0;
+
+    animation-name: appear;
+
+    animation-duration: var(--line-fade-duration);
+
+    animation-timing-function: ease;
+
+    animation-fill-mode: both;
+  }
+
+
+  /*
+     EDIT THE TIMING HERE
+
+     delay-03 = 0.3 seconds
+     delay-12 = 2.3 seconds
+     delay-23 = 4.1 seconds
+     delay-35 = 6.8 seconds
+     delay-48 = 9.4 seconds
+     delay-62 = 15 seconds
+     delay-69 = 21 seconds
+  */
+
+
+  .delay-03 {
+    animation-delay: 0.3s;
+  }
+
+
+  .delay-12 {
+    animation-delay: 2.3s;
+  }
+
+
+  .delay-23 {
+    animation-delay: 4.1s;
+  }
+
+
+  .delay-35 {
+    animation-delay: 6.8s;
+  }
+
+
+  .delay-48 {
+    animation-delay: 9.4s;
+  }
+
+
+  .delay-62 {
+    animation-delay: 15s;
+  }
+
+
+  .delay-69 {
+    animation-delay: 21s;
+  }
+
+
+  @keyframes appear {
+
+    0% {
+      opacity: 0;
+
+      transform: translateY(5px);
+    }
+
+    100% {
+      opacity: 1;
+
+      transform: translateY(0);
+    }
+
+  }
+
+
+  /* =========================================================
+     QUIET TEXT
+     ========================================================= */
+
+  .quiet {
+    color: var(--dim);
+
+    font-size: 0.65em;
+
+    margin-top: 1.8em;
+
+    letter-spacing: 0.08em;
+  }
+
+
+  .very-quiet {
+    color: var(--dim);
+
+    font-size: 0.45em;
+
+    margin-top: 1.8em;
+
+    letter-spacing: 0.08em;
+  }
+
+
+  /* =========================================================
+     IMPORTANT WORDS
+     ========================================================= */
+
+  .important {
+    display: inline-block;
+
+    color: var(--red);
+
+    position: relative;
+  }
+
+
+  /* =========================================================
+     ENDED
+     ========================================================= */
+
+  .important.ended {
+    animation:
+      trembleEnded
+      var(--shake-ended-speed)
+      infinite
+      steps(8);
+  }
+
+
+  @keyframes trembleEnded {
+
+    0% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+
+    13% {
+      transform: translate(-0.4px, 0.2px)
+                 rotate(-0.06deg);
+    }
+
+    27% {
+      transform: translate(0.6px, -0.3px)
+                 rotate(0.09deg);
+    }
+
+    41% {
+      transform: translate(-0.2px, 0.5px)
+                 rotate(-0.04deg);
+    }
+
+    56% {
+      transform: translate(0.4px, 0.1px)
+                 rotate(0.07deg);
+    }
+
+    70% {
+      transform: translate(-0.6px, -0.2px)
+                 rotate(-0.08deg);
+    }
+
+    84% {
+      transform: translate(0.2px, 0.4px)
+                 rotate(0.04deg);
+    }
+
+    100% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+
+  }
+
+
+  /* =========================================================
+     HERE
+     ========================================================= */
+
+  .important.here {
+    animation:
+      trembleHere
+      var(--shake-here-speed)
+      infinite
+      steps(10);
+  }
+
+
+  @keyframes trembleHere {
+
+    0% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+
+    10% {
+      transform: translate(0.2px, -0.2px)
+                 rotate(0.03deg);
+    }
+
+    22% {
+      transform: translate(-0.3px, 0.1px)
+                 rotate(-0.05deg);
+    }
+
+    34% {
+      transform: translate(0.1px, 0.3px)
+                 rotate(0.02deg);
+    }
+
+    47% {
+      transform: translate(-0.2px, -0.1px)
+                 rotate(-0.04deg);
+    }
+
+    59% {
+      transform: translate(0.3px, 0.2px)
+                 rotate(0.05deg);
+    }
+
+    72% {
+      transform: translate(-0.1px, -0.3px)
+                 rotate(-0.02deg);
+    }
+
+    85% {
+      transform: translate(0.2px, 0.1px)
+                 rotate(0.03deg);
+    }
+
+    100% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+
+  }
+
+
+  /* =========================================================
+     YET
+     ========================================================= */
+
+  .important.yet {
+    animation:
+      trembleYet
+      var(--shake-yet-speed)
+      infinite
+      steps(7);
+  }
+
+
+  @keyframes trembleYet {
+
+    0% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+
+    14% {
+      transform: translate(-0.8px, 0.5px)
+                 rotate(-0.18deg);
+    }
+
+    29% {
+      transform: translate(0.4px, -0.7px)
+                 rotate(0.12deg);
+    }
+
+    43% {
+      transform: translate(-0.3px, 0.3px)
+                 rotate(-0.06deg);
+    }
+
+    57% {
+      transform: translate(0.9px, 0.1px)
+                 rotate(0.17deg);
+    }
+
+    71% {
+      transform: translate(-0.5px, -0.4px)
+                 rotate(-0.12deg);
+    }
+
+    86% {
+      transform: translate(0.2px, 0.6px)
+                 rotate(0.08deg);
+    }
+
+    100% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+
+  }
+
+
+  /* =========================================================
+     KILL MYSELF
+     ========================================================= */
+
+  .important.kill {
+    animation:
+      trembleKill
+      var(--shake-kill-speed)
+      infinite
+      steps(9);
+  }
+
+
+  @keyframes trembleKill {
+
+    0% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+
+    12% {
+      transform: translate(0.5px, -0.3px)
+                 rotate(0.08deg);
+    }
+
+    25% {
+      transform: translate(-0.7px, 0.5px)
+                 rotate(-0.13deg);
+    }
+
+    37% {
+      transform: translate(0.2px, 0.8px)
+                 rotate(0.04deg);
+    }
+
+    50% {
+      transform: translate(-0.4px, -0.6px)
+                 rotate(-0.09deg);
+    }
+
+    62% {
+      transform: translate(0.8px, 0.2px)
+                 rotate(0.14deg);
+    }
+
+    75% {
+      transform: translate(-0.2px, -0.3px)
+                 rotate(-0.04deg);
+    }
+
+    87% {
+      transform: translate(0.4px, 0.5px)
+                 rotate(0.09deg);
+    }
+
+    100% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+
+  }
+
+
+  /* =========================================================
+     SUBTLE RED GLOW
+     ========================================================= */
+
+  .important::before {
+    content: '';
+
+    position: absolute;
+
+    inset: -2px;
+
+    background: var(--red);
+
+    opacity: 0;
+
+    filter: blur(8px);
+
+    z-index: -1;
+
+    pointer-events: none;
+
+    animation:
+      presence
+      4.7s
+      infinite;
+  }
+
+
+  .ended::before {
+    animation-delay: 0.9s;
+  }
+
+
+  .here::before {
+    animation-delay: 2.7s;
+  }
+
+
+  .kill::before {
+    animation-delay: 1.8s;
+  }
+
+
+  @keyframes presence {
+
+    0%,
+    72%,
+    100% {
+      opacity: 0;
+    }
+
+    74% {
+      opacity: 0.025;
+    }
+
+    76% {
+      opacity: 0;
+    }
+
+  }
+
+
+  /* =========================================================
+     MOBILE
+     ========================================================= */
+
+  @media (max-width: 600px) {
+
+    body {
+      padding: 2rem 1rem;
+    }
+
+    .font-control {
+      top: auto;
+
+      bottom: 2rem;
+
+      right: 1rem;
+    }
+
+  }
+
+
+  /* =========================================================
+     ACCESSIBILITY
+     ========================================================= */
+
+  @media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+    }
+
+    .line {
+      opacity: 1;
+    }
+
+  }
+
 </style>
 </head>
+
+
 <body>
 
-<div class="font-control">
-  <button class="font-btn active" data-font="FFF Tusj">Custom</button>
-  <button class="font-btn" data-font="fallback">Fallback</button>
+
+<!-- =========================================================
+     FONT BUTTONS
+     ========================================================= -->
+
+<div class="font-control" id="font-control">
+
+  <button
+    class="font-btn active"
+    data-font="FFF Tusj">
+    Custom
+  </button>
+
+  <button
+    class="font-btn"
+    data-font="fallback">
+    Fallback
+  </button>
+
 </div>
 
-<div class="comeback-wrap">
-  <span class="comeback-timer" id="comeback">--d --h --m --s ---ms</span>
-  <span class="comeback-sub">August 15, 2026</span>
+
+<!-- =========================================================
+     TIMER
+     ========================================================= -->
+
+<div
+  class="comeback-wrap"
+  id="comeback-wrap"
+>
+
+  <span
+    class="comeback-timer"
+    id="comeback"
+  >
+    --d --h --m --s ---ms
+  </span>
+
+  <span class="comeback-sub">
+    August 15, 2026
+  </span>
+
 </div>
+
 
 <script>
-  const comeback = { id: 'comeback', date: new Date('2026-08-15T07:00:00') };
+
+
+  /* =========================================================
+     TIMER SETTINGS
+
+     CHANGE ONLY THIS DATE IF YOU WANT TO MOVE THE END.
+     ========================================================= */
+
+  const comeback = {
+
+    id: 'comeback',
+
+    date: new Date(
+      '2026-08-15T07:00:00'
+    )
+
+  };
+
+
+  /* =========================================================
+     STATE
+     ========================================================= */
+
+  let finished = false;
+
+
+  /* =========================================================
+     TIMER FORMAT
+     ========================================================= */
 
   function fmt(diff) {
-    if (diff <= 0) return '00d 00h 00m 00s 000ms';
-    const totalMs = Math.floor(diff);
-    const ms = totalMs % 1000;
-    const totalSec = Math.floor(totalMs / 1000);
-    const s = totalSec % 60;
-    const m = Math.floor(totalSec / 60) % 60;
-    const h = Math.floor(totalSec / 3600) % 24;
-    const d = Math.floor(totalSec / 86400);
-    return `${String(d).padStart(2,'0')}d ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s ${String(ms).padStart(3,'0')}ms`;
+
+    if (diff <= 0) {
+
+      return '00d 00h 00m 00s 000ms';
+
+    }
+
+
+    const totalMs =
+      Math.floor(diff);
+
+
+    const ms =
+      totalMs % 1000;
+
+
+    const totalSec =
+      Math.floor(totalMs / 1000);
+
+
+    const s =
+      totalSec % 60;
+
+
+    const m =
+      Math.floor(totalSec / 60) % 60;
+
+
+    const h =
+      Math.floor(totalSec / 3600) % 24;
+
+
+    const d =
+      Math.floor(totalSec / 86400);
+
+
+    return (
+      `${String(d).padStart(2, '0')}d ` +
+      `${String(h).padStart(2, '0')}h ` +
+      `${String(m).padStart(2, '0')}m ` +
+      `${String(s).padStart(2, '0')}s ` +
+      `${String(ms).padStart(3, '0')}ms`
+    );
+
   }
+
+
+  /* =========================================================
+     FINAL MESSAGE
+
+     THIS IS THE ONLY PART YOU NEED TO EDIT
+     IF YOU WANT TO CHANGE THE MESSAGE.
+     ========================================================= */
+
+  function finish() {
+
+    if (finished) {
+      return;
+    }
+
+
+    finished = true;
+
+
+    document.body.innerHTML = `
+
+      <div class="finished-message">
+
+        <span class="line delay-03">
+          Hello.
+        </span>
+
+
+        <span class="line delay-12">
+          You waited until the timer
+          <span class="important ended">ended</span>.
+        </span>
+
+
+        <span class="line delay-23">
+          I'm still
+          <span class="important here">here</span>.
+        </span>
+
+
+        <span class="line delay-35">
+          Maybe I won't answer to any dms
+          <span class="important yet">YET</span>.
+        </span>
+
+
+        <span class="line delay-48">
+          But don't worry, I didn't
+          <span class="important kill">kill myself</span>.
+        </span>
+
+
+        <span class="line delay-62 quiet">
+          You can stop checking now.
+        </span>
+
+
+        <span class="line delay-69 very-quiet">
+          Please leave now.
+        </span>
+
+      </div>
+
+    `;
+
+
+    /*
+      Re-apply the body layout because
+      innerHTML replaced the previous content.
+    */
+
+    document.body.style.display = 'flex';
+
+    document.body.style.flexDirection =
+      'column';
+
+    document.body.style.alignItems =
+      'center';
+
+    document.body.style.justifyContent =
+      'center';
+
+  }
+
+
+  /* =========================================================
+     TIMER UPDATE
+     ========================================================= */
 
   function tick() {
-    const now = Date.now();
-    const cb = document.getElementById(comeback.id);
-    if (cb) {
-      const diff = comeback.date - now;
-      cb.textContent = fmt(diff);
-      if (diff < 7 * 24 * 3600 * 1000) cb.classList.add('near');
-      else cb.classList.remove('near');
+
+    /*
+      Don't continue updating once
+      the final page has appeared.
+    */
+
+    if (finished) {
+      return;
     }
+
+
+    const now =
+      Date.now();
+
+
+    const diff =
+      comeback.date.getTime() - now;
+
+
+    /*
+      IMPORTANT:
+
+      If the user opens the site AFTER
+      the timer has already ended, this
+      immediately calls finish().
+
+      The final message itself still has
+      its CSS animations, so the lines
+      appear progressively instead of
+      appearing all at once.
+    */
+
+    if (diff <= 0) {
+
+      finish();
+
+      return;
+
+    }
+
+
+    const cb =
+      document.getElementById(
+        comeback.id
+      );
+
+
+    if (!cb) {
+      return;
+    }
+
+
+    cb.textContent =
+      fmt(diff);
+
+
+    /*
+      Turn the timer red during
+      the final 7 days.
+    */
+
+    if (
+      diff <
+      7 * 24 * 3600 * 1000
+    ) {
+
+      cb.classList.add('near');
+
+    } else {
+
+      cb.classList.remove('near');
+
+    }
+
   }
 
-  tick();
-  setInterval(tick, 50);
 
-  const fontBtns = document.querySelectorAll('.font-btn');
-  document.documentElement.classList.add('custom-font');
-  document.body.classList.add('custom-font');
+  /* =========================================================
+     START TIMER
+     ========================================================= */
+
+  tick();
+
+
+  /*
+    Update every 50ms so the milliseconds
+    look smooth.
+  */
+
+  setInterval(
+    tick,
+    50
+  );
+
+
+  /* =========================================================
+     FONT SWITCHER
+     ========================================================= */
+
+  const fontBtns =
+    document.querySelectorAll(
+      '.font-btn'
+    );
+
+
+  /*
+    Custom font is selected by default.
+  */
+
+  document.documentElement
+    .classList
+    .add('custom-font');
+
+  document.body
+    .classList
+    .add('custom-font');
+
 
   fontBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const font = btn.dataset.font;
-      fontBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
 
-      if (font === 'fallback') {
-        document.documentElement.classList.remove('custom-font');
-        document.documentElement.classList.add('fallback-font');
-        document.body.classList.remove('custom-font');
-        document.body.classList.add('fallback-font');
-      } else {
-        document.documentElement.classList.remove('fallback-font');
-        document.documentElement.classList.add('custom-font');
-        document.body.classList.remove('fallback-font');
-        document.body.classList.add('custom-font');
+    btn.addEventListener(
+      'click',
+      () => {
+
+        const font =
+          btn.dataset.font;
+
+
+        /*
+          Update active button.
+        */
+
+        fontBtns.forEach(b => {
+
+          b.classList.remove(
+            'active'
+          );
+
+        });
+
+
+        btn.classList.add(
+          'active'
+        );
+
+
+        /*
+          Fallback font.
+        */
+
+        if (
+          font === 'fallback'
+        ) {
+
+          document.documentElement
+            .classList
+            .remove(
+              'custom-font'
+            );
+
+          document.documentElement
+            .classList
+            .add(
+              'fallback-font'
+            );
+
+
+          document.body
+            .classList
+            .remove(
+              'custom-font'
+            );
+
+          document.body
+            .classList
+            .add(
+              'fallback-font'
+            );
+
+        }
+
+
+        /*
+          Custom font.
+        */
+
+        else {
+
+          document.documentElement
+            .classList
+            .remove(
+              'fallback-font'
+            );
+
+          document.documentElement
+            .classList
+            .add(
+              'custom-font'
+            );
+
+
+          document.body
+            .classList
+            .remove(
+              'fallback-font'
+            );
+
+          document.body
+            .classList
+            .add(
+              'custom-font'
+            );
+
+        }
+
       }
-    });
+    );
+
   });
+
+
 </script>
+
 </body>
 </html>
