@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>.</title>
+
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --fg: #e8e4dc;
+      --dim: #3a3830;
+      --muted: #6b6660;
+      --accent: #c8b89a;
+    }
+
+    @font-face {
+      font-family: "FFF Tusj";
+      src:
+        url("fonts/FFFTusj.woff") format("woff"),
+        url("fonts/FFFTusj.ttf") format("truetype"),
+        url("https://fonts.cdnfonts.com/s/14716/FFFTusj.woff") format("woff");
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: "FFF Tusj", "Courier New", monospace;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+    }
+
+    body.fallback-font {
+      font-family: "Courier New", monospace !important;
+    }
+
+    .timer-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      text-align: center;
+    }
+
+    .timer {
+      font-size: clamp(32px, 10vw, 120px);
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      font-variant-numeric: tabular-nums;
+      word-spacing: 0.1em;
+      white-space: nowrap;
+    }
+
+    .date {
+      color: var(--dim);
+      font-size: 13px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-top: 0.3rem;
+    }
+
+    .font-control {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .font-btn {
+      padding: 0.5rem 1rem;
+      background: var(--dim);
+      border: 1px solid var(--muted);
+      color: var(--fg);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: 0.2s;
+    }
+
+    .font-btn:hover {
+      background: var(--muted);
+      color: var(--bg);
+    }
+
+    .font-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg);
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 2rem 1rem;
+      }
+
+      .timer {
+        white-space: normal;
+      }
+
+      .font-control {
+        top: auto;
+        bottom: 2rem;
+        right: 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="font-control">
+    <button class="font-btn active" data-font="custom">
+      Custom
+    </button>
+
+    <button class="font-btn" data-font="fallback">
+      Fallback
+    </button>
+  </div>
+
+
+  <div class="timer-container">
+    <div class="timer" id="timer">
+      00d 00h 00m 00s 000ms
+    </div>
+
+    <div class="date">
+      July 11, 2027
+    </div>
+  </div>
+
+
+  <script>
+    /*
+      Change this date manually later if needed.
+    */
+
+    const targetDate = new Date("2027-07-11T00:00:00");
+
+
+    function formatTime(milliseconds) {
+      if (milliseconds <= 0) {
+        return "00d 00h 00m 00s 000ms";
+      }
+
+      const totalMs = Math.floor(milliseconds);
+
+      const ms = totalMs % 1000;
+
+      const totalSeconds = Math.floor(totalMs / 1000);
+      const seconds = totalSeconds % 60;
+
+      const totalMinutes = Math.floor(totalSeconds / 60);
+      const minutes = totalMinutes % 60;
+
+      const totalHours = Math.floor(totalMinutes / 60);
+      const hours = totalHours % 24;
+
+      const days = Math.floor(totalHours / 24);
+
+
+      return (
+        String(days).padStart(2, "0") + "d " +
+        String(hours).padStart(2, "0") + "h " +
+        String(minutes).padStart(2, "0") + "m " +
+        String(seconds).padStart(2, "0") + "s " +
+        String(ms).padStart(3, "0") + "ms"
+      );
+    }
+
+
+    function updateTimer() {
+      const now = new Date();
+
+      const remaining =
+        targetDate.getTime() - now.getTime();
+
+      document.getElementById("timer").textContent =
+        formatTime(remaining);
+    }
+
+
+    updateTimer();
+
+    setInterval(updateTimer, 50);
+
+
+    /*
+      Font switcher
+    */
+
+    const buttons =
+      document.querySelectorAll(".font-btn");
+
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+
+        buttons.forEach((btn) => {
+          btn.classList.remove("active");
+        });
+
+        button.classList.add("active");
+
+
+        if (button.dataset.font === "fallback") {
+          document.body.classList.add("fallback-font");
+        } else {
+          document.body.classList.remove("fallback-font");
+        }
+
+      });
+    });
+  </script>
+
+</body>
+</html>
